@@ -102,15 +102,14 @@ jupyter notebook dog_app.ipynb
 
 __NOTE:__ While some code has already been implemented to get you started, you will need to implement additional functionality to successfully answer all of the questions included in the notebook. __Unless requested, do not modify code that has already been included.__
 
-## Evaluation
+## Dog Breed Web Application
 
-Your project will be reviewed by a Udacity reviewer against the CNN project [rubric](https://review.udacity.com/#!/rubrics/810/view).  Review this rubric thoroughly, and self-evaluate your project before submission.  All criteria found in the rubric must meet specifications for you to pass.
+![WebAppScreenshot][screenshot_dogbreed.PNG]
 
-## Project Submission
-
-When you are ready to submit your project, collect the following files and compress them into a single archive for upload:
-- The `dog_app.ipynb` file with fully functional code, all code cells executed and displaying output, and all questions answered.
-- An HTML or PDF export of the project notebook with the name `report.html` or `report.pdf`.
-- Any additional images used for the project that were not supplied to you for the project. __Please do not include the project data sets in the `dogImages/` or `lfw/` folders.  Likewise, please do not include the `bottleneck_features/` folder.__
-
-Alternatively, your submission could consist of the GitHub link to your repository.
+In order to use the application, you need to:
+1. Download the InceptionV3 weights to static/model_files/ folder using https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/DogXceptionData.npz url.
+2. Install docker-compose via `pip install docker-compose==1.29.2`
+3. Run `docker-compose build`
+4. Run  `docker-compose up`
+5. Go to http://0.0.0.0:3000/
+6. You can upload an image to get predictions.

@@ -14,46 +14,42 @@ from keras.utils import np_utils
 import numpy as np
 from glob import glob
 import cv2                
-import matplotlib.pyplot as plt  
+
 from keras.applications.resnet50 import preprocess_input, decode_predictions
 from keras.preprocessing import image                  
-from tqdm import tqdm
 from keras.applications.resnet50 import ResNet50
+from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D
+from keras.layers import Dropout, Flatten, Dense
+from keras.models import Sequential
+import keras
+import h5py
+import tensorflow as tf
 
+keras.backend.clear_session()
 app = Flask(__name__)
 app.secret_key= 'istavrit_dog_breed_prediction'
-app.config["UPLOAD_FOLDER"] = 'app/static/uploads/'
+app.config["UPLOAD_FOLDER"] = 'static/uploads/'
 app.config['MAX_CONTENT_LENGTH']= 16 * 1024 * 1024
 ALLOWED_EXTENTIONS={'png','jpg','jpeg'}
 
+global graph
+graph = tf.get_default_graph() 
+
 #initilize the model
 # load face detector
-face_cascade = cv2.CascadeClassifier("app/static/model_files/haarcascade_frontalface_alt.xml")
+face_cascade = cv2.CascadeClassifier("static/model_files/haarcascade_frontalface_alt.xml")
 # define ResNet50 model
 ResNet50_model = ResNet50(weights='imagenet')
-
-### Obtain bottleneck features from another pre-trained CNN.
-bottleneck_features = np.load("app/static/model_files/DogInceptionV3Data.npz")
-train_InceptionV3 = bottleneck_features['train']
-valid_InceptionV3 = bottleneck_features['valid']
-test_InceptionV3  = bottleneck_features['test']
-
-### Define your architecture.
-
-InceptionV3_Model = Sequential()
-
-InceptionV3_Model.add(GlobalAveragePooling2D(input_shape=train_InceptionV3.shape[1:]))
-
-InceptionV3_Model.add(Dense(133,activation='softmax'))
-
-#InceptionV3_Model.summary()
-
-### Compile the model.
+model_file= "static/model_files/dog_breed_model.h5"
+with h5py.File(model_file, 'a') as f:
+    if 'optimizer_weights' in f.keys():
+        del f['optimizer_weights']
+        
+InceptionV3_Model = keras.models.load_model("static/model_files/dog_breed_model.h5")
+InceptionV3_Model.load_weights('static/model_files/weights.best.InceptionV3.hdf5')
+### TODO: Compile the model.
 InceptionV3_Model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-### Load the model weights with the best validation loss.
-InceptionV3_Model.load_weights('app/static/model_files/weights.best.InceptionV3.hdf5')
-dog_names = pd.read_csv("app/static/model_files/dog_names.csv",delimiter=",")['dog_names'].tolist()
+dog_names = pd.read_csv("static/model_files/dog_names.csv",delimiter=",")['dog_names'].tolist()
 
 def path_to_tensor(img_path):
     # loads RGB image as PIL.Image.Image type
@@ -64,13 +60,18 @@ def path_to_tensor(img_path):
     return np.expand_dims(x, axis=0)
 
 def paths_to_tensor(img_paths):
-    list_of_tensors = [path_to_tensor(img_path) for img_path in tqdm(img_paths)]
+    list_of_tensors = [path_to_tensor(img_path) for img_path in img_paths]
     return np.vstack(list_of_tensors)
 
 def ResNet50_predict_labels(img_path):
     # returns prediction vector for image located at img_path
     img = preprocess_input(path_to_tensor(img_path))
     return np.argmax(ResNet50_model.predict(img))
+
+def dog_detector(img_path):
+    with graph.as_default():
+        prediction = ResNet50_predict_labels(img_path)
+    return ((prediction <= 268) & (prediction >= 151))
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".",1)[1].lower() in ALLOWED_EXTENTIONS
@@ -82,7 +83,12 @@ def index():
     
     return render_template('master.html')
 
+def extract_InceptionV3(tensor):
+    from keras.applications.inception_v3 import InceptionV3, preprocess_input
+    return InceptionV3(weights='imagenet', include_top=False).predict(preprocess_input(tensor))
+
 def InceptionV3_predict_breed(img_path):
+
     # extract bottleneck features
     bottleneck_feature = extract_InceptionV3(path_to_tensor(img_path))
     # obtain predicted vector
@@ -95,8 +101,9 @@ def InceptionV3_predict_breed(img_path):
 def get_prediction(filename):
 
     if dog_detector(filename)==True:
-        predicted_breed=InceptionV3_predict_breed(filename).split(".")[1]
-        return "Predicted dog breed : {}".format(predicted_breed) 
+        with graph.as_default():
+            predicted_breed=InceptionV3_predict_breed(filename).split(".")[1]
+    return "Predicted dog breed : {}".format(predicted_breed) 
     # if human is predicted, return resemblence
     if face_detector(filename)==True:
         predicted_breed=InceptionV3_predict_breed(filename).split(".")[1]
@@ -105,6 +112,7 @@ def get_prediction(filename):
     else:
         return "Could not detect any dog or human."
 
+    
 # web page that handles user query and displays model results
 @app.route('/',methods=['POST'])
 def upload_image():
@@ -125,7 +133,7 @@ def upload_image():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
             flash("Image successfully uploaded")
-            prediction = get_prediction(filename)
+            prediction = get_prediction(app.config['UPLOAD_FOLDER']+filename)
             return render_template("master.html",filename=filename,prediction=prediction)
 
         else:
