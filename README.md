@@ -104,7 +104,7 @@ __NOTE:__ While some code has already been implemented to get you started, you w
 
 ## Dog Breed Web Application
 
-![WebAppScreenshot][screenshot_dogbreed.PNG]
+![WebAppScreenshot](screenshot_dogbreed.PNG)
 
 In order to use the application, you need to:
 1. Download the InceptionV3 weights to static/model_files/ folder using https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/DogXceptionData.npz url.
