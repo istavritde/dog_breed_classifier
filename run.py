@@ -51,6 +51,13 @@ InceptionV3_Model.load_weights('static/model_files/weights.best.InceptionV3.hdf5
 InceptionV3_Model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 dog_names = pd.read_csv("static/model_files/dog_names.csv",delimiter=",")['dog_names'].tolist()
 
+# returns "True" if face is detected in image stored at img_path
+def face_detector(img_path):
+    img = cv2.imread(img_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray)
+    return len(faces) > 0
+    
 def path_to_tensor(img_path):
     # loads RGB image as PIL.Image.Image type
     img = image.load_img(img_path, target_size=(224, 224))
