@@ -9,11 +9,23 @@
 
 Welcome to the Convolutional Neural Networks (CNN) project in the AI Nanodegree! In this project, you will learn how to build a pipeline that can be used within a web or mobile app to process real-world, user-supplied images.  Given an image of a dog, your algorithm will identify an estimate of the canine’s breed.  If supplied an image of a human, the code will identify the resembling dog breed.  
 
-![Sample Output][image1]
+## Dog Breed Predictor Web Application
 
-Along with exploring state-of-the-art CNN models for classification, you will make important design decisions about the user experience for your app.  Our goal is that by completing this lab, you understand the challenges involved in piecing together a series of models designed to perform various tasks in a data processing pipeline.  Each model has its strengths and weaknesses, and engineering a real-world application often involves solving many problems without a perfect answer.  Your imperfect solution will nonetheless create a fun user experience!
+Dog Breed Predictor web application is running on docker container using Flask. It loads the trained model from the dog_app.ipynb and predicts the dog breed from the loaded image. It can also distinguish whether the uploaded photo has human in it.
+
+![WebAppScreenshot](screenshot_dogbreed.PNG)
+
+In order to use the application, you need to:
+1. Download the InceptionV3 weights to static/model_files/ folder using https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/DogXceptionData.npz url.
+2. Install docker-compose via `pip install docker-compose==1.29.2`
+3. Run `docker-compose build`
+4. Run  `docker-compose up`
+5. Go to http://0.0.0.0:3000/
+6. You can upload an image to get predictions.
 
 ## Project Instructions
+
+In order to train the model you can follow the instructions below:
 
 ### Instructions
 
@@ -102,14 +114,3 @@ jupyter notebook dog_app.ipynb
 
 __NOTE:__ While some code has already been implemented to get you started, you will need to implement additional functionality to successfully answer all of the questions included in the notebook. __Unless requested, do not modify code that has already been included.__
 
-## Dog Breed Web Application
-
-![WebAppScreenshot](screenshot_dogbreed.PNG)
-
-In order to use the application, you need to:
-1. Download the InceptionV3 weights to static/model_files/ folder using https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/DogXceptionData.npz url.
-2. Install docker-compose via `pip install docker-compose==1.29.2`
-3. Run `docker-compose build`
-4. Run  `docker-compose up`
-5. Go to http://0.0.0.0:3000/
-6. You can upload an image to get predictions.
