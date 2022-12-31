@@ -7,11 +7,11 @@
 
 ## Project Overview
 
-Welcome to the Convolutional Neural Networks (CNN) project in the AI Nanodegree! In this project, you will learn how to build a pipeline that can be used within a web or mobile app to process real-world, user-supplied images.  Given an image of a dog, your algorithm will identify an estimate of the canine’s breed.  If supplied an image of a human, the code will identify the resembling dog breed.  
+Trained a CNN model and created a pipeline that is used in web application to process real-world, user-supplied images.  Given an image of a dog, algorithm will identify an estimate of the canine’s breed.  If supplied an image of a human, the code will identify the resembling dog breed.
 
 ## Dog Breed Predictor Web Application
 
-Dog Breed Predictor web application is running on docker container using Flask. It loads the trained model from the dog_app.ipynb and predicts the dog breed from the loaded image. It can also distinguish whether the uploaded photo has human in it.
+Dog Breed Predictor web application is running on docker container using Flask. It loads the trained model from the dog_app.ipynb and predicts the dog breed from the loaded image.
 
 ![WebAppScreenshot](screenshot_dogbreed.PNG)
 
